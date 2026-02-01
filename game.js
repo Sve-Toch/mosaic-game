@@ -1,0 +1,473 @@
+// ============================================
+// ИГРА "МОЗАИКА ВЕЛИКИХ КАРТИН"
+// ============================================
+// Основная логика игры.
+// Данные (элементы и рецепты) находятся в файле data.js
+// ============================================
+
+// Состояние игры
+let gameState = {
+    unlockedElements: [],
+    createdPaintings: [],
+    slot1: null,
+    slot2: null
+};
+
+// Инициализация базовых элементов
+function initBaseElements() {
+    // Добавляем флаг isBase к базовым элементам
+    return baseElements.map(el => ({ ...el, isBase: true }));
+}
+
+// Загрузка сохранённого состояния
+function loadGameState() {
+    const saved = localStorage.getItem('mosaicGameState');
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        gameState = {
+            ...gameState,
+            ...parsed,
+            slot1: null,
+            slot2: null
+        };
+    } else {
+        // Новая игра — только базовые элементы
+        gameState.unlockedElements = initBaseElements();
+    }
+}
+
+// Сохранение состояния
+function saveGameState() {
+    const toSave = {
+        unlockedElements: gameState.unlockedElements,
+        createdPaintings: gameState.createdPaintings
+    };
+    localStorage.setItem('mosaicGameState', JSON.stringify(toSave));
+}
+
+// Инициализация игры
+function initGame() {
+    loadGameState();
+    
+    // Если элементов нет — инициализируем базовые
+    if (gameState.unlockedElements.length === 0) {
+        gameState.unlockedElements = initBaseElements();
+    }
+    
+    renderElements();
+    renderGallery();
+    updateStats();
+    setupEventListeners();
+}
+
+// Рендеринг элементов
+function renderElements() {
+    const grid = document.getElementById('elements-grid');
+    grid.innerHTML = '';
+
+    gameState.unlockedElements.forEach(element => {
+        const div = document.createElement('div');
+        div.className = 'element';
+        div.draggable = true;
+        div.dataset.elementId = element.id;
+        
+        // Проверяем, новый ли это элемент
+        if (!element.isBase && gameState.createdPaintings.length > 0) {
+            const lastPainting = gameState.createdPaintings[gameState.createdPaintings.length - 1];
+            const recipe = recipes.find(r => r.id === lastPainting);
+            if (recipe && recipe.unlocks === element.id) {
+                div.classList.add('new');
+                setTimeout(() => div.classList.remove('new'), 3000);
+            }
+        }
+
+        div.innerHTML = `
+            <span class="element-icon">${element.icon}</span>
+            <span class="element-name">${element.name}</span>
+        `;
+
+        // Drag events
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragend', handleDragEnd);
+        
+        // Click to add to slot
+        div.addEventListener('click', () => handleElementClick(element));
+
+        grid.appendChild(div);
+    });
+}
+
+// Обработка клика по элементу
+function handleElementClick(element) {
+    if (!gameState.slot1) {
+        gameState.slot1 = element;
+        updateSlot(1, element);
+    } else if (!gameState.slot2) {
+        gameState.slot2 = element;
+        updateSlot(2, element);
+    }
+}
+
+// Drag and Drop
+function handleDragStart(e) {
+    e.target.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', e.target.dataset.elementId);
+}
+
+function handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    
+    const elementId = e.dataTransfer.getData('text/plain');
+    const element = gameState.unlockedElements.find(el => el.id === elementId);
+    
+    if (element) {
+        const slotNumber = parseInt(e.currentTarget.dataset.slot);
+        if (slotNumber === 1) {
+            gameState.slot1 = element;
+        } else {
+            gameState.slot2 = element;
+        }
+        updateSlot(slotNumber, element);
+    }
+}
+
+// Обновление слота
+function updateSlot(slotNumber, element) {
+    const slot = document.getElementById(`slot${slotNumber}`);
+    slot.classList.add('filled');
+    slot.innerHTML = `
+        <span class="element-icon">${element.icon}</span>
+        <span class="element-name">${element.name}</span>
+    `;
+}
+
+// Очистка слотов
+function clearSlots() {
+    gameState.slot1 = null;
+    gameState.slot2 = null;
+    
+    [1, 2].forEach(num => {
+        const slot = document.getElementById(`slot${num}`);
+        slot.classList.remove('filled');
+        slot.innerHTML = '<span class="slot-placeholder">Перетащите элемент</span>';
+    });
+}
+
+// Создание картины
+function tryCreatePainting() {
+    if (!gameState.slot1 || !gameState.slot2) {
+        showMessage('Поместите два элемента в слоты!', 'error');
+        return;
+    }
+
+    const elements = [gameState.slot1.id, gameState.slot2.id].sort();
+    
+    // Поиск рецепта
+    const recipe = recipes.find(r => {
+        const recipeElements = [...r.elements].sort();
+        return recipeElements[0] === elements[0] && recipeElements[1] === elements[1];
+    });
+
+    if (recipe) {
+        if (gameState.createdPaintings.includes(recipe.id)) {
+            showMessage('Вы уже создали эту картину!', 'error');
+        } else {
+            createPainting(recipe);
+        }
+    } else {
+        showMessage('Эта комбинация не создаёт картину. Попробуйте другую!', 'error');
+    }
+
+    clearSlots();
+}
+
+// Создание картины
+function createPainting(recipe) {
+    gameState.createdPaintings.push(recipe.id);
+    
+    // Разблокировка нового элемента
+    if (recipe.unlocks) {
+        const newElement = unlockableElements.find(el => el.id === recipe.unlocks);
+        if (newElement && !gameState.unlockedElements.find(el => el.id === newElement.id)) {
+            gameState.unlockedElements.push({ ...newElement });
+        }
+    }
+
+    saveGameState();
+    renderElements();
+    renderGallery();
+    updateStats();
+    showPaintingModal(recipe);
+}
+
+// Стандартный градиент для всех картин (если нет изображения)
+const DEFAULT_GRADIENT = 'linear-gradient(135deg, #5c6bc0 0%, #3f51b5 50%, #303f9f 100%)';
+
+// Создание карточки картины (с изображением или заглушкой)
+function createPaintingCard(recipe, size = 'large') {
+    const container = document.createElement('div');
+    container.className = `painting-card painting-card-${size}`;
+    
+    if (recipe.image) {
+        const img = document.createElement('img');
+        img.className = 'painting-card-img';
+        img.alt = recipe.name;
+        
+        img.onload = function() {
+            container.innerHTML = '';
+            container.appendChild(img);
+        };
+        
+        img.onerror = function() {
+            // Заглушка если изображение не загрузилось
+            container.innerHTML = `
+                <div class="painting-card-bg" style="background: ${DEFAULT_GRADIENT};">
+                    <div class="painting-card-frame">🖼️</div>
+                    <div class="painting-card-title">${recipe.name}</div>
+                </div>
+            `;
+        };
+        
+        img.src = recipe.image;
+        
+        // Показываем заглушку пока грузится
+        container.innerHTML = `
+            <div class="painting-card-bg" style="background: ${DEFAULT_GRADIENT};">
+                <div class="painting-card-frame">🖼️</div>
+                <div class="painting-card-title">${recipe.name}</div>
+            </div>
+        `;
+    } else {
+        // Нет изображения — показываем заглушку
+        container.innerHTML = `
+            <div class="painting-card-bg" style="background: ${DEFAULT_GRADIENT};">
+                <div class="painting-card-frame">🖼️</div>
+                <div class="painting-card-title">${recipe.name}</div>
+            </div>
+        `;
+    }
+    
+    return container;
+}
+
+// Показать модальное окно с картиной
+function showPaintingModal(recipe) {
+    const modal = document.getElementById('painting-modal');
+    
+    const imageContainer = document.getElementById('modal-painting-image');
+    imageContainer.innerHTML = '';
+    imageContainer.appendChild(createPaintingCard(recipe, 'large'));
+    
+    document.getElementById('modal-painting-name').textContent = `"${recipe.name}"`;
+    document.getElementById('modal-painting-author').textContent = `${recipe.author}, ${recipe.year}`;
+    document.getElementById('modal-painting-description').textContent = recipe.description;
+    
+    // Новый элемент (unlocks может быть null или строкой 'null' в данных)
+    const newElementDiv = document.getElementById('modal-new-element');
+    const newElementReveal = document.querySelector('.new-element-reveal');
+    
+    const hasUnlock = recipe.unlocks && recipe.unlocks !== 'null';
+    const newElement = hasUnlock ? unlockableElements.find(el => el.id === recipe.unlocks) : null;
+    
+    if (newElement) {
+        newElementDiv.textContent = `${newElement.icon} ${newElement.name}`;
+        newElementReveal.style.display = 'block';
+    } else {
+        newElementReveal.style.display = 'none';
+    }
+    
+    modal.classList.add('active');
+}
+
+// Рендеринг галереи
+function renderGallery() {
+    const grid = document.getElementById('gallery-grid');
+    
+    if (gameState.createdPaintings.length === 0) {
+        grid.innerHTML = '<p class="gallery-empty">Ваша коллекция пуста. Начните комбинировать элементы!</p>';
+        return;
+    }
+
+    grid.innerHTML = '';
+    
+    gameState.createdPaintings.forEach(paintingId => {
+        const recipe = recipes.find(r => r.id === paintingId);
+        if (recipe) {
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            
+            const imageDiv = document.createElement('div');
+            imageDiv.className = 'gallery-item-image';
+            
+            if (recipe.image) {
+                const img = document.createElement('img');
+                img.className = 'gallery-thumb';
+                img.alt = recipe.name;
+                img.onerror = function() {
+                    imageDiv.innerHTML = `
+                        <div class="gallery-fallback" style="background: ${DEFAULT_GRADIENT};">
+                            <span class="gallery-icon">🖼️</span>
+                        </div>
+                    `;
+                };
+                img.src = recipe.image;
+                imageDiv.appendChild(img);
+            } else {
+                imageDiv.innerHTML = `
+                    <div class="gallery-fallback" style="background: ${DEFAULT_GRADIENT};">
+                        <span class="gallery-icon">🖼️</span>
+                    </div>
+                `;
+            }
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'gallery-item-info';
+            infoDiv.innerHTML = `
+                <div class="gallery-item-title">"${recipe.name}"</div>
+                <div class="gallery-item-author">${recipe.author}</div>
+            `;
+            
+            item.appendChild(imageDiv);
+            item.appendChild(infoDiv);
+            item.addEventListener('click', () => showGalleryModal(recipe));
+            grid.appendChild(item);
+        }
+    });
+}
+
+// Показать картину из галереи
+function showGalleryModal(recipe) {
+    const modal = document.getElementById('gallery-modal');
+    
+    const imageContainer = document.getElementById('gallery-painting-image');
+    imageContainer.innerHTML = '';
+    imageContainer.appendChild(createPaintingCard(recipe, 'large'));
+    
+    document.getElementById('gallery-painting-name').textContent = `"${recipe.name}"`;
+    document.getElementById('gallery-painting-author').textContent = `${recipe.author}, ${recipe.year}`;
+    document.getElementById('gallery-painting-description').textContent = recipe.description;
+    
+    // Вопросы для размышления (как при открытии новой картины)
+    const questionsDiv = document.getElementById('gallery-modal-questions');
+    if (recipe.questions && recipe.questions.length > 0) {
+        questionsDiv.innerHTML = `
+            <h4>Вопросы для размышления:</h4>
+            <ul>
+                ${recipe.questions.map(q => `<li>${q}</li>`).join('')}
+            </ul>
+        `;
+        questionsDiv.style.display = 'block';
+    } else {
+        questionsDiv.innerHTML = '';
+        questionsDiv.style.display = 'none';
+    }
+    
+    modal.classList.add('active');
+}
+
+// Обновление статистики
+function updateStats() {
+    document.getElementById('paintings-count').textContent = gameState.createdPaintings.length;
+    document.getElementById('elements-count').textContent = gameState.unlockedElements.length;
+}
+
+// Показать сообщение
+function showMessage(text, type) {
+    const combineZone = document.querySelector('.combine-zone');
+    
+    const existingMsg = combineZone.querySelector('.error-message, .success-message');
+    if (existingMsg) existingMsg.remove();
+    
+    const msg = document.createElement('div');
+    msg.className = type === 'error' ? 'error-message' : 'success-message';
+    msg.textContent = text;
+    combineZone.appendChild(msg);
+    
+    setTimeout(() => msg.remove(), 3000);
+}
+
+// Подсказка
+function showHint() {
+    const availableRecipes = recipes.filter(r => {
+        if (gameState.createdPaintings.includes(r.id)) return false;
+        return r.elements.every(elId => 
+            gameState.unlockedElements.find(el => el.id === elId)
+        );
+    });
+
+    const hintText = document.getElementById('hint-text');
+    
+    if (availableRecipes.length === 0) {
+        hintText.textContent = 'Поздравляем! Вы создали все доступные картины!';
+    } else {
+        const randomRecipe = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
+        const el1 = gameState.unlockedElements.find(el => el.id === randomRecipe.elements[0]);
+        const el2 = gameState.unlockedElements.find(el => el.id === randomRecipe.elements[1]);
+        hintText.textContent = `Попробуйте: ${el1.icon} ${el1.name} + ${el2.icon} ${el2.name}`;
+    }
+}
+
+// Настройка обработчиков событий
+function setupEventListeners() {
+    // Слоты для перетаскивания
+    const slots = document.querySelectorAll('.slot');
+    slots.forEach(slot => {
+        slot.addEventListener('dragover', handleDragOver);
+        slot.addEventListener('dragleave', handleDragLeave);
+        slot.addEventListener('drop', handleDrop);
+    });
+
+    // Кнопки
+    document.getElementById('combine-btn').addEventListener('click', tryCreatePainting);
+    document.getElementById('clear-btn').addEventListener('click', clearSlots);
+    document.getElementById('hint-btn').addEventListener('click', showHint);
+
+    document.getElementById('guide-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        var ids = gameState.unlockedElements.map(function(el) { return el.id; });
+        var q = ids.length ? '?unlocked=' + encodeURIComponent(ids.join(',')) : '';
+        window.location.href = 'guide.html' + q;
+    });
+
+    // Закрытие модальных окон
+    document.getElementById('close-modal').addEventListener('click', () => {
+        document.getElementById('painting-modal').classList.remove('active');
+    });
+    
+    document.getElementById('close-gallery-modal').addEventListener('click', () => {
+        document.getElementById('gallery-modal').classList.remove('active');
+    });
+
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+    });
+}
+
+// Запуск игры
+document.addEventListener('DOMContentLoaded', initGame);

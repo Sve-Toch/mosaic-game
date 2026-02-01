@@ -1,0 +1,778 @@
+/* Основные стили - Светлый современный дизайн */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+}
+
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Заголовок */
+.header {
+    text-align: center;
+    padding: 40px 0 30px;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Статистика */
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.stat-item {
+    text-align: center;
+    background: #fff;
+    padding: 20px 35px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+}
+
+.stat-number {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #5c6bc0;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #95a5a6;
+    margin-top: 5px;
+}
+
+/* Основная игровая область */
+.game-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+/* Панель элементов */
+.elements-panel {
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.elements-panel h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+.elements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 12px;
+}
+
+.element {
+    background: linear-gradient(145deg, #fff, #f8f9fa);
+    border: 2px solid #e9ecef;
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: grab;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.element:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    border-color: #5c6bc0;
+}
+
+.element:active {
+    cursor: grabbing;
+}
+
+.element.dragging {
+    opacity: 0.5;
+    transform: scale(1.1);
+}
+
+.element-icon {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.element-name {
+    font-size: 0.8rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.element.new {
+    animation: pulse 1.5s ease-in-out infinite;
+    border-color: #5c6bc0;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(92, 107, 192, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(92, 107, 192, 0); }
+}
+
+/* Зона комбинирования */
+.combine-zone {
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.combine-zone h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-size: 1.3rem;
+}
+
+.combine-slots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.slot {
+    width: 110px;
+    height: 110px;
+    background: #f8f9fa;
+    border: 3px dashed #dee2e6;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.slot.drag-over {
+    border-color: #5c6bc0;
+    background: #fff5eb;
+    transform: scale(1.05);
+}
+
+.slot.filled {
+    border-style: solid;
+    border-color: #5c6bc0;
+    background: #fff;
+}
+
+.slot-placeholder {
+    color: #adb5bd;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.slot .element-icon {
+    font-size: 2.5rem;
+}
+
+.slot .element-name {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.plus-sign {
+    font-size: 2rem;
+    color: #5c6bc0;
+    font-weight: 300;
+}
+
+.combine-btn {
+    background: linear-gradient(145deg, #5c6bc0, #3f51b5);
+    color: #fff;
+    border: none;
+    padding: 14px 40px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.combine-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(92, 107, 192, 0.4);
+}
+
+.combine-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.clear-btn {
+    background: #fff;
+    color: #3498db;
+    border: 2px solid #3498db;
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+    background: #ebf5fb;
+}
+
+/* Подсказка внутри зоны комбинирования */
+.combine-zone .hint-block {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
+}
+
+.combine-zone .hint-intro {
+    color: #95a5a6;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.combine-zone .hint-btn {
+    background: #fff;
+    color: #3498db;
+    border: 2px solid #3498db;
+    padding: 10px 25px;
+    font-size: 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.combine-zone .hint-btn:hover {
+    background: #3498db;
+    color: #fff;
+}
+
+.combine-zone .hint-text {
+    color: #27ae60;
+    font-style: italic;
+    margin-top: 12px;
+    min-height: 20px;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Галерея */
+.gallery-section {
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.gallery-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 18px;
+}
+
+.gallery-empty {
+    color: #adb5bd;
+    font-style: italic;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+}
+
+.gallery-item {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #f1f3f4;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px);
+    border-color: #5c6bc0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.gallery-item-image {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    overflow: hidden;
+}
+
+.gallery-item-image .gallery-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .gallery-thumb {
+    transform: scale(1.1);
+}
+
+.gallery-item-image .gallery-icon {
+    font-size: 3.5rem;
+}
+
+.gallery-item-info {
+    padding: 14px;
+}
+
+.gallery-item-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.gallery-item-author {
+    font-size: 0.8rem;
+    color: #95a5a6;
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 24px;
+    padding: 35px;
+    max-width: 550px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    animation: modalSlide 0.4s ease;
+    /* Скроллбар — более явный (Firefox) */
+    scrollbar-width: thin;
+    scrollbar-color: #5c6bc0 #e8e8e8;
+}
+
+/* Стилизация скроллбара в модальном окне (Chrome, Safari, Edge) */
+.modal-content::-webkit-scrollbar {
+    width: 12px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #e8e8e8;
+    border-radius: 6px;
+    margin: 4px 0;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #5c6bc0;
+    border-radius: 6px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #3f51b5;
+}
+
+@keyframes modalSlide {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.8rem;
+    color: #bdc3c7;
+    cursor: pointer;
+    transition: color 0.3s;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #e74c3c;
+}
+
+.painting-reveal {
+    text-align: center;
+}
+
+.painting-reveal h2 {
+    color: #5c6bc0;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.painting-image {
+    margin: 20px 0;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Окно «Новая картина!» — вписываем в экран без прокрутки */
+#painting-modal .modal-content {
+    max-height: 95vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 28px;
+}
+
+#painting-modal .painting-reveal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+}
+
+#painting-modal .painting-reveal h2 {
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+#painting-modal .painting-image {
+    margin: 10px 0;
+    min-height: 0;
+    max-height: 32vh;
+    flex-shrink: 1;
+}
+
+#painting-modal .painting-image .painting-card,
+#painting-modal .painting-image .painting-card-large {
+    max-width: 220px;
+    max-height: 30vh;
+    min-height: 0;
+}
+
+#painting-modal .painting-image .painting-card-img,
+#painting-modal .painting-image .painting-card-bg {
+    max-height: 28vh;
+    min-height: 80px;
+}
+
+#painting-modal .painting-image .painting-card-img {
+    object-fit: contain;
+}
+
+#painting-modal .painting-reveal h3 {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+}
+
+#painting-modal .painting-author {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+#painting-modal .painting-description {
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    flex-shrink: 0;
+    max-height: 8em;
+    overflow-y: auto;
+}
+
+#painting-modal .new-element-reveal {
+    margin-top: 12px;
+    padding: 14px;
+    flex-shrink: 0;
+}
+
+#painting-modal .new-element-reveal p {
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.painting-reveal h3 {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+}
+
+.painting-author {
+    color: #5c6bc0;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.painting-description {
+    color: #7f8c8d;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.new-element-reveal {
+    padding: 20px 0;
+    margin-top: 20px;
+}
+
+.new-element-reveal p {
+    color: #95a5a6;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.new-element {
+    display: inline-block;
+    color: #5c6bc0;
+    padding: 4px 0;
+    font-weight: 600;
+}
+
+.thinking-questions {
+    margin-top: 20px;
+    text-align: left;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.thinking-questions h4 {
+    color: #5c6bc0;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.thinking-questions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.thinking-questions li {
+    color: #7f8c8d;
+    padding: 6px 0;
+    padding-left: 28px;
+    position: relative;
+    font-size: 0.9rem;
+}
+
+.thinking-questions li::before {
+    content: "?";
+    position: absolute;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: #5c6bc0;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Футер */
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #95a5a6;
+}
+
+.footer a {
+    color: #5c6bc0 !important;
+    transition: color 0.3s;
+}
+
+.footer a:hover {
+    color: #3f51b5 !important;
+}
+
+/* Сообщения об ошибках */
+.error-message {
+    background: #fdf2f2;
+    border: 1px solid #f5c6cb;
+    color: #e74c3c;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 20px;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Карточки картин */
+.painting-card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.painting-card-large {
+    width: 100%;
+    max-width: 380px;
+    min-height: 220px;
+}
+
+.painting-card-bg {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+}
+
+.painting-card-frame {
+    font-size: 5rem;
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
+
+.painting-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #fff;
+    text-align: center;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+}
+
+.painting-card-img {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.painting-image .painting-icon,
+.image-container .painting-icon {
+    font-size: 5rem;
+}
+
+/* Галерея fallback */
+.gallery-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .game-area {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+    }
+
+    .stats {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .combine-slots {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .plus-sign {
+        transform: rotate(90deg);
+    }
+
+    .slot {
+        width: 100px;
+        height: 100px;
+    }
+}

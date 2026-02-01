@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Мозаика великих картин</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Заголовок -->
+        <header class="header">
+            <h1>Мозаика великих картин</h1>
+            <p class="subtitle">Создавайте шедевры русской живописи</p>
+        </header>
+
+        <!-- Статистика -->
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number" id="paintings-count">0</span>
+                <span class="stat-label">Картин создано</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="elements-count">5</span>
+                <span class="stat-label">Элементов открыто</span>
+            </div>
+        </div>
+
+        <!-- Основная игровая область -->
+        <div class="game-area">
+            <!-- Панель элементов -->
+            <div class="elements-panel">
+                <h2>Элементы</h2>
+                <div class="elements-grid" id="elements-grid">
+                    <!-- Элементы будут добавлены через JavaScript -->
+                </div>
+            </div>
+
+            <!-- Зона комбинирования -->
+            <div class="combine-zone">
+                <h2>Зона комбинирования</h2>
+                <div class="combine-slots">
+                    <div class="slot" id="slot1" data-slot="1">
+                        <span class="slot-placeholder">Перетащите элемент</span>
+                    </div>
+                    <span class="plus-sign">+</span>
+                    <div class="slot" id="slot2" data-slot="2">
+                        <span class="slot-placeholder">Перетащите элемент</span>
+                    </div>
+                </div>
+                <button class="combine-btn" id="combine-btn">Создать картину</button>
+                <button class="clear-btn" id="clear-btn">Очистить</button>
+                <div class="hint-block">
+                    <p class="hint-intro">Попробуйте комбинировать базовые элементы. Каждая картина открывает новый элемент!</p>
+                    <button class="hint-btn" id="hint-btn">Показать подсказку</button>
+                    <p class="hint-text" id="hint-text"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Галерея созданных картин -->
+        <div class="gallery-section">
+            <h2>Моя галерея</h2>
+            <div class="gallery-grid" id="gallery-grid">
+                <p class="gallery-empty">Ваша коллекция пуста. Начните комбинировать элементы!</p>
+            </div>
+        </div>
+
+        <!-- Модальное окно для новой картины -->
+        <div class="modal" id="painting-modal">
+            <div class="modal-content">
+                <span class="close-btn" id="close-modal">&times;</span>
+                <div class="painting-reveal">
+                    <h2>Новая картина!</h2>
+                    <div class="painting-image" id="modal-painting-image"></div>
+                    <h3 id="modal-painting-name"></h3>
+                    <p class="painting-author" id="modal-painting-author"></p>
+                    <p class="painting-description" id="modal-painting-description"></p>
+                    <div class="new-element-reveal">
+                        <p>Открыт новый элемент:</p>
+                        <div class="new-element" id="modal-new-element"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для просмотра картины из галереи -->
+        <div class="modal" id="gallery-modal">
+            <div class="modal-content">
+                <span class="close-btn" id="close-gallery-modal">&times;</span>
+                <div class="painting-reveal">
+                    <div class="painting-image" id="gallery-painting-image"></div>
+                    <h3 id="gallery-painting-name"></h3>
+                    <p class="painting-author" id="gallery-painting-author"></p>
+                    <p class="painting-description" id="gallery-painting-description"></p>
+                    <div class="thinking-questions" id="gallery-modal-questions"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Футер -->
+        <footer class="footer">
+            <p>Игра вдохновлена шедеврами русских художников</p>
+            <a href="guide.html" id="guide-link" style="color: #5c6bc0; text-decoration: none;">Справочник всех комбинаций</a>
+        </footer>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

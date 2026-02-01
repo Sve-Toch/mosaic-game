@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мозаика великих картин — Справочник</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Open Sans', sans-serif;
+                    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .back-link {
+            display: inline-block;
+            color: #5c6bc0;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(92, 107, 192, 0.3);
+        }
+        header h1 { font-size: 2rem; color: #2c3e50; margin-bottom: 8px; }
+        header p { color: #7f8c8d; font-size: 0.95rem; }
+
+        .guide-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 700px) {
+            .guide-layout { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .panel h2 {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .elements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .element-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .element-btn:hover {
+            border-color: #5c6bc0;
+            background: #f8f9ff;
+        }
+        .element-btn.selected {
+            border-color: #5c6bc0;
+            background: linear-gradient(145deg, #f0f2ff, #e8ebff);
+            font-weight: 600;
+        }
+        .element-btn.locked {
+            opacity: 0.6;
+            color: #95a5a6;
+            background: #f8f9fa;
+        }
+        .element-btn.locked .element-icon { filter: grayscale(0.5); }
+        .element-btn .element-icon { font-size: 1.6rem; flex-shrink: 0; }
+        .element-btn .element-name { flex: 1; }
+
+        .result-area {
+            min-height: 200px;
+        }
+        .result-placeholder {
+            color: #95a5a6;
+            text-align: center;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+        .result-title {
+            font-size: 0.9rem;
+            color: #5c6bc0;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .recipe-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .recipe-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+        .recipe-card .pair {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .recipe-card .elem-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .recipe-card .elem-chip.locked {
+            background: #e9ecef;
+            color: #95a5a6;
+        }
+        .recipe-card .elem-chip .icon { font-size: 1.2rem; }
+        .recipe-card .arrow { color: #5c6bc0; font-weight: bold; }
+        .recipe-card .painting-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-left: 4px;
+        }
+        .recipe-card .painting-author {
+            font-weight: normal;
+            color: #95a5a6;
+            font-size: 0.9rem;
+        }
+        .recipe-card .unlock-info {
+            font-size: 0.85rem;
+            color: #5c6bc0;
+            margin-top: 6px;
+            width: 100%;
+        }
+        .recipe-card .unlock-info .elem-chip { margin-left: 4px; }
+        .legend-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+        .legend-row span { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; background: #e9ecef; }
+        .legend-dot.unlocked { background: #5c6bc0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Вернуться к игре</a>
+        <header>
+            <h1>Справочник комбинаций</h1>
+            <p>Выберите элемент и посмотрите, какие картины из него можно создать</p>
+        </header>
+
+        <div class="guide-layout">
+            <div class="panel">
+                <h2>Элементы</h2>
+                <div class="elements-list" id="elements-list"></div>
+                <div class="legend-row">
+                    <span><i class="legend-dot unlocked"></i> открыт</span>
+                    <span><i class="legend-dot"></i> ещё не открыт</span>
+                </div>
+            </div>
+            <div class="panel result-area">
+                <h2>Что можно создать</h2>
+                <div class="result-placeholder" id="result-placeholder">Выберите элемент слева</div>
+                <div class="result-content" id="result-content" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+    <script src="data.js"></script>
+    <script>
+        (function() {
+            var unlockedIds = [];
+            var selectedElementId = null;
+
+            function loadUnlockedFromStorage() {
+                unlockedIds = [];
+                var fromUrl = /[?&]unlocked=([^&]*)/.exec(window.location.search);
+                if (fromUrl && fromUrl[1]) {
+                    try {
+                        unlockedIds = decodeURIComponent(fromUrl[1]).split(',').filter(Boolean);
+                    } catch (e) {}
+                }
+                if (unlockedIds.length === 0) {
+                    try {
+                        var saved = localStorage.getItem('mosaicGameState');
+                        if (saved) {
+                            var state = JSON.parse(saved);
+                            if (state.unlockedElements && Array.isArray(state.unlockedElements)) {
+                                unlockedIds = state.unlockedElements.map(function(el) { return el.id; });
+                            }
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            function getAllElements() {
+                var list = [];
+                (baseElements || []).forEach(function(el) { list.push({ id: el.id, name: el.name, icon: el.icon, base: true }); });
+                (unlockableElements || []).forEach(function(el) { list.push({ id: el.id, name: el.name, icon: el.icon, base: false }); });
+                return list;
+            }
+
+            function getElementById(id) {
+                var all = getAllElements();
+                for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
+                return null;
+            }
+
+            function getRecipesForElement(elementId) {
+                return (recipes || []).filter(function(r) {
+                    return r.elements && r.elements.indexOf(elementId) !== -1;
+                });
+            }
+
+            function renderElementsList(selectedId) {
+                loadUnlockedFromStorage();
+                var container = document.getElementById('elements-list');
+                var all = getAllElements();
+                container.innerHTML = '';
+                all.forEach(function(el) {
+                    var unlocked = el.base || unlockedIds.indexOf(el.id) !== -1;
+                    var btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'element-btn' + (unlocked ? '' : ' locked') + (selectedId === el.id ? ' selected' : '');
+                    btn.innerHTML = '<span class="element-icon">' + (el.icon || '') + '</span><span class="element-name">' + (el.name || el.id) + '</span>';
+                    btn.addEventListener('click', function() { selectElement(el.id); });
+                    container.appendChild(btn);
+                });
+            }
+
+            function selectElement(elementId) {
+                selectedElementId = elementId;
+                renderElementsList(elementId);
+                var placeholder = document.getElementById('result-placeholder');
+                var content = document.getElementById('result-content');
+                var recipeList = getRecipesForElement(elementId);
+                var el = getElementById(elementId);
+                if (!el) {
+                    placeholder.style.display = 'block';
+                    content.style.display = 'none';
+                    placeholder.textContent = 'Элемент не найден';
+                    return;
+                }
+                if (recipeList.length === 0) {
+                    placeholder.style.display = 'block';
+                    content.style.display = 'none';
+                    placeholder.textContent = 'Из этого элемента пока нет комбинаций';
+                    return;
+                }
+                placeholder.style.display = 'none';
+                content.style.display = 'block';
+                content.innerHTML = '<div class="result-title">' + el.icon + ' ' + el.name + ' + ...</div><div class="recipe-list"></div>';
+                var listEl = content.querySelector('.recipe-list');
+                recipeList.forEach(function(recipe) {
+                    var otherId = recipe.elements[0] === elementId ? recipe.elements[1] : recipe.elements[0];
+                    var otherEl = getElementById(otherId);
+                    var otherUnlocked = otherEl && (otherEl.base || unlockedIds.indexOf(otherId) !== -1);
+                    var otherName = otherEl ? otherEl.name : otherId;
+                    var otherIcon = otherEl ? otherEl.icon : '?';
+                    var unlocksId = recipe.unlocks && recipe.unlocks !== 'null' ? recipe.unlocks : null;
+                    var unlockEl = unlocksId ? getElementById(unlocksId) : null;
+                    var unlockHtml = unlockEl
+                        ? '<div class="unlock-info">Открывает: <span class="elem-chip' + (unlockedIds.indexOf(unlocksId) !== -1 ? '' : ' locked') + '"><span class="icon">' + unlockEl.icon + '</span>' + unlockEl.name + '</span></div>'
+                        : '';
+                    var line = document.createElement('div');
+                    line.className = 'recipe-card';
+                    line.innerHTML =
+                        '<div class="pair">' +
+                        '<span class="elem-chip"><span class="icon">' + el.icon + '</span>' + el.name + '</span>' +
+                        '<span class="arrow">+</span>' +
+                        '<span class="elem-chip' + (otherUnlocked ? '' : ' locked') + '"><span class="icon">' + otherIcon + '</span>' + otherName + '</span>' +
+                        '<span class="arrow">→</span>' +
+                        '<span class="painting-name">' + (recipe.name || recipe.id) + '</span>' +
+                        (recipe.author ? ' <span class="painting-author">(' + recipe.author + ')</span>' : '') +
+                        '</div>' +
+                        unlockHtml;
+                    listEl.appendChild(line);
+                });
+            }
+
+            function refreshFromStorage() {
+                loadUnlockedFromStorage();
+                if (selectedElementId) {
+                    selectElement(selectedElementId);
+                } else {
+                    renderElementsList(null);
+                }
+            }
+
+            function init() {
+                renderElementsList(null);
+                document.addEventListener('visibilitychange', function() {
+                    if (document.visibilityState === 'visible') {
+                        refreshFromStorage();
+                    }
+                });
+                window.addEventListener('focus', refreshFromStorage);
+                window.addEventListener('pageshow', function() {
+                    refreshFromStorage();
+                });
+                window.addEventListener('storage', function(e) {
+                    if (e.key === 'mosaicGameState') {
+                        loadUnlockedFromStorage();
+                        if (selectedElementId) {
+                            selectElement(selectedElementId);
+                        } else {
+                            renderElementsList(null);
+                        }
+                    }
+                });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>
