@@ -13,6 +13,18 @@ let gameState = {
     slot2: null
 };
 
+// Определение мобильного/тач-устройства (для отключения drag и показа подсказки)
+function isMobileOrTouch() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || window.matchMedia('(max-width: 480px)').matches;
+}
+
+function dismissMobileTapHint() {
+    const hint = document.getElementById('mobile-tap-hint');
+    if (hint && !hint.classList.contains('dismissed')) {
+        hint.classList.add('dismissed');
+    }
+}
+
 // Инициализация базовых элементов
 function initBaseElements() {
     // Добавляем флаг isBase к базовым элементам
@@ -65,10 +77,11 @@ function renderElements() {
     const grid = document.getElementById('elements-grid');
     grid.innerHTML = '';
 
+    const useTouchOnly = isMobileOrTouch();
     gameState.unlockedElements.forEach(element => {
         const div = document.createElement('div');
         div.className = 'element';
-        div.draggable = true;
+        div.draggable = !useTouchOnly;
         div.dataset.elementId = element.id;
         
         // Проверяем, новый ли это элемент
@@ -86,25 +99,31 @@ function renderElements() {
             <span class="element-name">${element.name}</span>
         `;
 
-        // Drag events
-        div.addEventListener('dragstart', handleDragStart);
-        div.addEventListener('dragend', handleDragEnd);
-        
-        // Click to add to slot
-        div.addEventListener('click', () => handleElementClick(element));
+        // На мобильном только тап; на десктопе — drag и клик
+        if (!useTouchOnly) {
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+        }
+        div.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleElementClick(element);
+            dismissMobileTapHint();
+        });
 
         grid.appendChild(div);
     });
 }
 
-// Обработка клика по элементу
+// Обработка клика по элементу (основной способ на мобильном)
 function handleElementClick(element) {
     if (!gameState.slot1) {
         gameState.slot1 = element;
         updateSlot(1, element);
+        dismissMobileTapHint();
     } else if (!gameState.slot2) {
         gameState.slot2 = element;
         updateSlot(2, element);
+        dismissMobileTapHint();
     }
 }
 
@@ -159,12 +178,27 @@ function updateSlot(slotNumber, element) {
 function clearSlots() {
     gameState.slot1 = null;
     gameState.slot2 = null;
-    
+    resetSlotsDOM();
+}
+
+function resetSlotsDOM() {
     [1, 2].forEach(num => {
         const slot = document.getElementById(`slot${num}`);
         slot.classList.remove('filled');
         slot.innerHTML = '<span class="slot-placeholder">Перетащите элемент</span>';
     });
+}
+
+// Очистка одного слота (удобно на мобильном: тап по слоту убирает элемент)
+function clearSlot(slotNumber) {
+    if (slotNumber === 1) {
+        gameState.slot1 = null;
+    } else {
+        gameState.slot2 = null;
+    }
+    const slot = document.getElementById(`slot${slotNumber}`);
+    slot.classList.remove('filled');
+    slot.innerHTML = '<span class="slot-placeholder">Перетащите элемент</span>';
 }
 
 // Создание картины
@@ -188,11 +222,10 @@ function tryCreatePainting() {
         } else {
             createPainting(recipe);
         }
+        clearSlots();
     } else {
-        showMessage('Эта комбинация не создаёт картину. Попробуйте другую!', 'error');
+        showNoRecipeMessage();
     }
-
-    clearSlots();
 }
 
 // Создание картины
@@ -400,6 +433,57 @@ function showMessage(text, type) {
     setTimeout(() => msg.remove(), 3000);
 }
 
+// Сообщение при неизвестной комбинации + ссылка «Предложить свой вариант»
+function showNoRecipeMessage() {
+    const combineZone = document.querySelector('.combine-zone');
+    
+    const existingMsg = combineZone.querySelector('.error-message, .success-message');
+    if (existingMsg) existingMsg.remove();
+    
+    const msg = document.createElement('div');
+    msg.className = 'error-message error-with-suggest';
+    msg.innerHTML = 'Эта комбинация не создаёт картину. <button type="button" class="suggest-link">Предложить свой вариант</button>';
+    combineZone.appendChild(msg);
+    
+    msg.querySelector('.suggest-link').addEventListener('click', () => {
+        msg.remove();
+        showSuggestModal();
+    });
+}
+
+// Показать модальное окно «Предложить свой вариант»
+function showSuggestModal() {
+    if (!gameState.slot1 || !gameState.slot2) return;
+    
+    const comboEl = document.getElementById('suggest-combination');
+    comboEl.innerHTML = `
+        <span class="suggest-el">${gameState.slot1.icon} ${gameState.slot1.name}</span>
+        <span class="suggest-plus">+</span>
+        <span class="suggest-el">${gameState.slot2.icon} ${gameState.slot2.name}</span>
+    `;
+    
+    document.getElementById('suggest-name').value = '';
+    document.getElementById('suggest-author').value = '';
+    document.getElementById('suggest-modal').classList.add('active');
+}
+
+// Закрыть модальное окно предложения и очистить слоты
+function closeSuggestModal() {
+    document.getElementById('suggest-modal').classList.remove('active');
+    clearSlots();
+}
+
+// Отправить предложение на почту (mailto)
+function sendSuggestToEmail(name, author) {
+    const el1 = gameState.slot1 ? `${gameState.slot1.icon} ${gameState.slot1.name}` : '';
+    const el2 = gameState.slot2 ? `${gameState.slot2.icon} ${gameState.slot2.name}` : '';
+    const body = `Комбинация элементов: ${el1} + ${el2}\n\nПредложенное название картины: ${name}\nПредложенный автор: ${author}`;
+    const subject = `Предложение для Мозаики: "${name}" — ${author}`;
+    const mailto = `mailto:svetoch22@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+    closeSuggestModal();
+}
+
 // Подсказка
 function showHint() {
     const availableRecipes = recipes.filter(r => {
@@ -423,16 +507,27 @@ function showHint() {
 
 // Настройка обработчиков событий
 function setupEventListeners() {
-    // Слоты для перетаскивания
+    // Слоты: перетаскивание (десктоп) и тап для очистки (мобильный)
     const slots = document.querySelectorAll('.slot');
     slots.forEach(slot => {
         slot.addEventListener('dragover', handleDragOver);
         slot.addEventListener('dragleave', handleDragLeave);
         slot.addEventListener('drop', handleDrop);
+        if (isMobileOrTouch()) {
+            slot.addEventListener('click', () => {
+                const num = parseInt(slot.dataset.slot, 10);
+                if (slot.classList.contains('filled')) {
+                    clearSlot(num);
+                }
+            });
+        }
     });
 
     // Кнопки
-    document.getElementById('combine-btn').addEventListener('click', tryCreatePainting);
+    document.getElementById('combine-btn').addEventListener('click', () => {
+        dismissMobileTapHint();
+        tryCreatePainting();
+    });
     document.getElementById('clear-btn').addEventListener('click', clearSlots);
     document.getElementById('hint-btn').addEventListener('click', showHint);
 
@@ -452,10 +547,24 @@ function setupEventListeners() {
         document.getElementById('gallery-modal').classList.remove('active');
     });
 
+    document.getElementById('close-suggest-modal').addEventListener('click', closeSuggestModal);
+
+    document.getElementById('suggest-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('suggest-name').value.trim();
+        const author = document.getElementById('suggest-author').value.trim();
+        if (name && author) {
+            sendSuggestToEmail(name, author);
+        }
+    });
+
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.classList.remove('active');
+                if (modal.id === 'suggest-modal') {
+                    clearSlots();
+                }
             }
         });
     });
@@ -465,6 +574,9 @@ function setupEventListeners() {
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.classList.remove('active');
             });
+            if (document.getElementById('suggest-modal').classList.contains('active')) {
+                clearSlots();
+            }
         }
     });
 }

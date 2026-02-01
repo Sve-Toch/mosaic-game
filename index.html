@@ -53,6 +53,7 @@
                 <button class="combine-btn" id="combine-btn">Создать картину</button>
                 <button class="clear-btn" id="clear-btn">Очистить</button>
                 <div class="hint-block">
+                    <p class="mobile-tap-hint" id="mobile-tap-hint" aria-hidden="true">Нажмите на элемент — он попадёт в слот. Выберите два и нажмите «Создать картину».</p>
                     <p class="hint-intro">Попробуйте комбинировать базовые элементы. Каждая картина открывает новый элемент!</p>
                     <button class="hint-btn" id="hint-btn">Показать подсказку</button>
                     <p class="hint-text" id="hint-text"></p>
@@ -97,6 +98,27 @@
                     <p class="painting-description" id="gallery-painting-description"></p>
                     <div class="thinking-questions" id="gallery-modal-questions"></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно «Предложить свой вариант» (нет комбинации) -->
+        <div class="modal" id="suggest-modal">
+            <div class="modal-content suggest-modal-content">
+                <span class="close-btn" id="close-suggest-modal">&times;</span>
+                <h2>Предложить свой вариант</h2>
+                <p class="suggest-intro">Такой комбинации пока нет в игре. Предложите название картины и автора — мы добавим её!</p>
+                <div class="suggest-combination" id="suggest-combination"></div>
+                <form class="suggest-form" id="suggest-form">
+                    <label>
+                        <span>Название картины</span>
+                        <input type="text" id="suggest-name" placeholder="Например: Утро в сосновом лесу" required>
+                    </label>
+                    <label>
+                        <span>Автор</span>
+                        <input type="text" id="suggest-author" placeholder="Например: И. И. Шишкин" required>
+                    </label>
+                    <button type="submit" class="combine-btn">Отправить на почту</button>
+                </form>
             </div>
         </div>
 

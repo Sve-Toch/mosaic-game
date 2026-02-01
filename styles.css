@@ -269,6 +269,29 @@ h1, h2, h3 {
     text-align: center;
 }
 
+/* Подсказка для мобильных — показывается только на узких экранах */
+.mobile-tap-hint {
+    display: none;
+    color: #5c6bc0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    background: #e8ecf7;
+    border-radius: 12px;
+    border-left: 4px solid #5c6bc0;
+}
+
+@media (max-width: 480px) {
+    .mobile-tap-hint {
+        display: block;
+    }
+
+    .mobile-tap-hint.dismissed {
+        display: none;
+    }
+}
+
 .combine-zone .hint-intro {
     color: #95a5a6;
     font-size: 0.9rem;
@@ -676,6 +699,100 @@ h1, h2, h3 {
     75% { transform: translateX(5px); }
 }
 
+.error-with-suggest {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+}
+
+.suggest-link {
+    background: none;
+    border: none;
+    color: #5c6bc0;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    font-family: inherit;
+}
+
+.suggest-link:hover {
+    color: #3f51b5;
+}
+
+/* Модальное окно «Предложить свой вариант» */
+.suggest-modal-content {
+    max-width: 420px;
+}
+
+.suggest-modal-content h2 {
+    margin-bottom: 12px;
+    color: #2c3e50;
+}
+
+.suggest-intro {
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.suggest-combination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+    border-radius: 14px;
+    margin-bottom: 24px;
+    font-size: 1rem;
+}
+
+.suggest-el {
+    background: #fff;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.suggest-plus {
+    color: #5c6bc0;
+    font-weight: 700;
+}
+
+.suggest-form label {
+    display: block;
+    margin-bottom: 16px;
+}
+
+.suggest-form label span {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.suggest-form input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.suggest-form input:focus {
+    outline: none;
+    border-color: #5c6bc0;
+}
+
+.suggest-form button[type="submit"] {
+    width: 100%;
+    margin-top: 8px;
+}
+
 /* Карточки картин */
 .painting-card {
     border-radius: 16px;
@@ -746,7 +863,7 @@ h1, h2, h3 {
     justify-content: center;
 }
 
-/* Адаптивность */
+/* Адаптивность — планшеты и большие телефоны */
 @media (max-width: 768px) {
     .game-area {
         grid-template-columns: 1fr;
@@ -774,5 +891,186 @@ h1, h2, h3 {
     .slot {
         width: 100px;
         height: 100px;
+    }
+}
+
+/* Мобильные телефоны — удобные зоны нажатия и компактный вид */
+@media (max-width: 480px) {
+    .game-container {
+        padding: 12px;
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
+
+    .header {
+        padding: 20px 0 16px;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+    }
+
+    .stats {
+        flex-direction: row;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stat-item {
+        padding: 14px 20px;
+        flex: 1;
+        max-width: 160px;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .game-area {
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .elements-panel,
+    .combine-zone,
+    .gallery-section {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .elements-panel h2,
+    .combine-zone h2,
+    .gallery-section h2 {
+        font-size: 1.1rem;
+        margin-bottom: 14px;
+    }
+
+    /* Крупная сетка элементов для пальца (минимум ~44px зона) */
+    .elements-grid {
+        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+        gap: 10px;
+    }
+
+    .element {
+        padding: 12px 8px;
+        min-height: 56px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .element-icon {
+        font-size: 1.8rem;
+        margin-bottom: 4px;
+    }
+
+    .element-name {
+        font-size: 0.75rem;
+    }
+
+    /* Слоты — крупнее и на всю ширину для удобного тапа */
+    .combine-slots {
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .slot {
+        width: 100%;
+        max-width: 140px;
+        height: 80px;
+        margin: 0 auto;
+        min-height: 80px;
+    }
+
+    .slot .element-icon {
+        font-size: 2rem;
+    }
+
+    .slot .element-name {
+        font-size: 0.75rem;
+    }
+
+    /* Кнопки во всю ширину, крупнее для пальца */
+    .combine-zone .combine-btn,
+    .combine-zone .clear-btn {
+        display: block;
+        width: 100%;
+        padding: 14px 20px;
+        margin: 0 0 8px 0;
+        min-height: 48px;
+        font-size: 1rem;
+    }
+
+    .combine-zone .clear-btn {
+        margin-bottom: 0;
+    }
+
+    .combine-zone .hint-btn {
+        width: 100%;
+        padding: 12px 20px;
+        min-height: 44px;
+    }
+
+    .hint-block {
+        margin-top: 16px;
+        padding-top: 16px;
+    }
+
+    .hint-intro {
+        font-size: 0.85rem;
+    }
+
+    /* Галерея — 2 колонки на узком экране */
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .gallery-item-image {
+        height: 100px;
+    }
+
+    .gallery-item-title {
+        font-size: 0.8rem;
+    }
+
+    .gallery-item-author {
+        font-size: 0.75rem;
+    }
+
+    .footer {
+        padding: 16px 12px;
+        font-size: 0.9rem;
+    }
+
+    /* Модалки — больше отступы от краёв и safe area */
+    .modal-content {
+        width: calc(100% - 24px);
+        max-width: none;
+        margin: env(safe-area-inset-top) 12px env(safe-area-inset-bottom);
+        max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+
+    .close-btn {
+        top: 12px;
+        right: 16px;
+        font-size: 2rem;
+        padding: 8px;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
