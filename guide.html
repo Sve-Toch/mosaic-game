@@ -478,7 +478,6 @@
 
         <div class="guide-layout">
             <div class="panel elements-panel">
-                <h2>Элементы</h2>
                 <div class="search-wrapper">
                     <input type="text" class="search-input" id="element-search" placeholder="Поиск элемента...">
                 </div>
@@ -618,6 +617,15 @@
                 recipeList.forEach(function(recipe) {
                     var el1Id = recipe.elements[0];
                     var el2Id = recipe.elements[1];
+
+                    // Если выбран конкретный элемент — он должен быть первым в паре
+                    if (highlightElementId && el2Id === highlightElementId) {
+                        // Меняем местами
+                        var tmp = el1Id;
+                        el1Id = el2Id;
+                        el2Id = tmp;
+                    }
+
                     var el1 = getElementById(el1Id);
                     var el2 = getElementById(el2Id);
                     var el1Unlocked = el1 && (el1.base || unlockedIds.indexOf(el1.id) !== -1);
