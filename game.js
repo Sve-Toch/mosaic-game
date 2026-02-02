@@ -126,9 +126,17 @@ function showMobileNoRecipeMessage(el1, el2) {
     toast.className = 'mobile-toast mobile-toast-with-action';
     toast.innerHTML = `
         <span>Комбинация не найдена</span>
-        <button class="toast-suggest-btn">Предложить</button>
+        <div class="toast-buttons">
+            <button class="toast-continue-btn">Продолжить</button>
+            <button class="toast-suggest-btn">Предложить</button>
+        </div>
     `;
     document.body.appendChild(toast);
+    
+    toast.querySelector('.toast-continue-btn').addEventListener('click', () => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    });
     
     toast.querySelector('.toast-suggest-btn').addEventListener('click', () => {
         toast.remove();

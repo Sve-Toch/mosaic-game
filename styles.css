@@ -1006,20 +1006,43 @@ h1, h2, h3 {
 
 .mobile-toast.mobile-toast-with-action {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 12px;
+    padding: 16px 20px;
+}
+
+.toast-buttons {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+.toast-continue-btn {
+    background: #fff;
+    color: #5c6bc0;
+    border: 2px solid #5c6bc0;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    min-height: 40px;
 }
 
 .toast-suggest-btn {
     background: #5c6bc0;
     color: #fff;
     border: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
+    min-height: 40px;
 }
 
 @keyframes toastIn {
