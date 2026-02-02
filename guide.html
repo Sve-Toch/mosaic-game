@@ -197,6 +197,19 @@
             width: 100%;
         }
         .recipe-card .unlock-info .elem-chip { margin-left: 4px; }
+        
+        /* Скрытие элементов для десктоп/мобайл */
+        .mobile-only { display: none; }
+        .desktop-only { display: inline-flex; }
+        
+        /* Блок с названием картины для мобильных */
+        .painting-info {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 6px;
+        }
+
         .legend-row {
             display: flex;
             gap: 20px;
@@ -391,6 +404,10 @@
                 display: none;
             }
 
+            /* Переключение десктоп/мобайл элементов */
+            .mobile-only { display: flex; }
+            .desktop-only { display: none !important; }
+
             /* Компактные карточки рецептов в bottom sheet */
             .bottom-sheet .recipe-list {
                 gap: 10px;
@@ -398,7 +415,7 @@
 
             .bottom-sheet .recipe-card {
                 padding: 10px 12px;
-                gap: 6px;
+                gap: 8px;
                 flex-direction: column;
                 align-items: flex-start;
             }
@@ -406,6 +423,7 @@
             .bottom-sheet .recipe-card .pair {
                 width: 100%;
                 gap: 6px;
+                flex-wrap: wrap;
             }
 
             .bottom-sheet .recipe-card .elem-chip {
@@ -420,6 +438,26 @@
 
             .bottom-sheet .recipe-card .arrow {
                 font-size: 0.9rem;
+            }
+
+            /* Блок с названием картины на отдельной строке */
+            .bottom-sheet .painting-info {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: baseline;
+                gap: 6px;
+                padding-left: 4px;
+            }
+
+            .bottom-sheet .recipe-card .painting-info .painting-name {
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            .bottom-sheet .recipe-card .painting-info .painting-author {
+                font-size: 0.8rem;
+                color: #95a5a6;
             }
 
             .bottom-sheet .recipe-card .painting-name {
@@ -641,9 +679,13 @@
                         '<span class="elem-chip' + (el1Unlocked ? '' : ' locked') + '"><span class="icon">' + (el1 ? el1.icon : '?') + '</span>' + (el1 ? el1.name : el1Id) + '</span>' +
                         '<span class="arrow">+</span>' +
                         '<span class="elem-chip' + (el2Unlocked ? '' : ' locked') + '"><span class="icon">' + (el2 ? el2.icon : '?') + '</span>' + (el2 ? el2.name : el2Id) + '</span>' +
-                        '<span class="arrow">→</span>' +
+                        '<span class="arrow desktop-only">→</span>' +
+                        '<span class="painting-name desktop-only">' + (recipe.name || recipe.id) + '</span>' +
+                        (recipe.author ? '<span class="painting-author desktop-only">(' + recipe.author + ')</span>' : '') +
+                        '</div>' +
+                        '<div class="painting-info mobile-only">' +
                         '<span class="painting-name">' + (recipe.name || recipe.id) + '</span>' +
-                        (recipe.author ? ' <span class="painting-author">(' + recipe.author + ')</span>' : '') +
+                        (recipe.author ? '<span class="painting-author">(' + recipe.author + ')</span>' : '') +
                         '</div>' +
                         unlockHtml +
                         '</div>';
