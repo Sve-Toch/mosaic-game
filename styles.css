@@ -592,6 +592,14 @@ h1, h2, h3 {
     font-size: 0.85rem;
 }
 
+#painting-modal .modal-continue-btn {
+    margin-top: 14px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    min-height: 44px;
+    flex-shrink: 0;
+}
+
 .painting-reveal h3 {
     color: #2c3e50;
     font-size: 1.4rem;
@@ -627,6 +635,33 @@ h1, h2, h3 {
     color: #5c6bc0;
     padding: 4px 0;
     font-weight: 600;
+}
+
+/* Кнопка "Продолжить" / "Закрыть" в модальных окнах */
+.modal-continue-btn {
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    margin: 20px auto 0;
+    padding: 14px 30px;
+    background: linear-gradient(145deg, #5c6bc0, #3f51b5);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 50px;
+}
+
+.modal-continue-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 20px rgba(92, 107, 192, 0.4);
+}
+
+.modal-continue-btn:active {
+    transform: scale(0.98);
 }
 
 .thinking-questions {

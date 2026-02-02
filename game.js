@@ -735,6 +735,15 @@ function setupEventListeners() {
         document.getElementById('gallery-modal').classList.remove('active');
     });
 
+    // Кнопки "Продолжить" / "Закрыть" в модальных окнах
+    document.getElementById('painting-continue-btn').addEventListener('click', () => {
+        document.getElementById('painting-modal').classList.remove('active');
+    });
+    
+    document.getElementById('gallery-continue-btn').addEventListener('click', () => {
+        document.getElementById('gallery-modal').classList.remove('active');
+    });
+
     document.getElementById('close-suggest-modal').addEventListener('click', closeSuggestModal);
 
     document.getElementById('suggest-form').addEventListener('submit', (e) => {
