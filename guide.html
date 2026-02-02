@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Open Sans', sans-serif;
-                    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
             min-height: 100vh;
             color: #333;
             padding: 20px;
@@ -39,9 +39,6 @@
             gap: 24px;
             align-items: start;
         }
-        @media (max-width: 700px) {
-            .guide-layout { grid-template-columns: 1fr; }
-        }
 
         .panel {
             background: #fff;
@@ -55,6 +52,27 @@
             margin-bottom: 16px;
             padding-bottom: 10px;
             border-bottom: 1px solid #e9ecef;
+        }
+
+        /* Поиск элементов */
+        .search-wrapper {
+            margin-bottom: 12px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #5c6bc0;
+        }
+        .search-input::placeholder {
+            color: #adb5bd;
         }
 
         .elements-list {
@@ -94,6 +112,21 @@
         .element-btn.locked .element-icon { filter: grayscale(0.5); }
         .element-btn .element-icon { font-size: 1.6rem; flex-shrink: 0; }
         .element-btn .element-name { flex: 1; }
+        .element-btn.hidden { display: none; }
+
+        /* Кнопка "Все комбинации" */
+        .show-all-btn {
+            background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
+            border-color: #81c784;
+        }
+        .show-all-btn:hover {
+            background: linear-gradient(145deg, #c8e6c9, #a5d6a7);
+            border-color: #66bb6a;
+        }
+        .show-all-btn.selected {
+            background: linear-gradient(145deg, #a5d6a7, #81c784);
+            border-color: #4caf50;
+        }
 
         .result-area {
             min-height: 200px;
@@ -177,6 +210,199 @@
         .legend-row span { display: flex; align-items: center; gap: 6px; }
         .legend-dot { width: 12px; height: 12px; border-radius: 50%; background: #e9ecef; }
         .legend-dot.unlocked { background: #5c6bc0; }
+
+        /* ========================================
+           МОБИЛЬНЫЕ СТИЛИ (< 700px)
+           ======================================== */
+        @media (max-width: 700px) {
+            body {
+                padding: 12px;
+            }
+
+            header {
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+            header h1 {
+                font-size: 1.5rem;
+            }
+            header p {
+                font-size: 0.85rem;
+            }
+
+            .guide-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+            }
+
+            /* Sticky панель элементов */
+            .panel.elements-panel {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                border-radius: 16px 16px 0 0;
+                padding: 14px;
+                margin-bottom: 0;
+                max-height: 45vh;
+                overflow-y: auto;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            }
+
+            .panel.elements-panel h2 {
+                margin-bottom: 10px;
+                padding-bottom: 8px;
+                font-size: 1rem;
+            }
+
+            .search-input {
+                padding: 10px 12px;
+                font-size: 0.95rem;
+            }
+
+            /* Сетка элементов вместо списка */
+            .elements-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 8px;
+            }
+
+            .element-btn {
+                flex-direction: column;
+                padding: 10px 6px;
+                gap: 4px;
+                text-align: center;
+                min-height: 70px;
+                justify-content: center;
+            }
+
+            .element-btn .element-icon {
+                font-size: 1.5rem;
+                margin: 0;
+            }
+
+            .element-btn .element-name {
+                font-size: 0.65rem;
+                line-height: 1.2;
+                word-break: break-word;
+                hyphens: auto;
+            }
+
+            /* Кнопка "Все" в сетке */
+            .show-all-btn .element-icon {
+                font-size: 1.3rem;
+            }
+
+            .legend-row {
+                margin-top: 10px;
+                padding-top: 10px;
+                font-size: 0.75rem;
+                gap: 12px;
+                justify-content: center;
+            }
+
+            .legend-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            /* Панель результатов */
+            .panel.result-area {
+                border-radius: 0 0 16px 16px;
+                padding: 14px;
+                min-height: auto;
+            }
+
+            .panel.result-area h2 {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+
+            .result-placeholder {
+                padding: 20px 12px;
+                font-size: 0.9rem;
+            }
+
+            .result-title {
+                font-size: 0.85rem;
+                margin-bottom: 10px;
+            }
+
+            /* Компактные карточки рецептов */
+            .recipe-list {
+                gap: 10px;
+            }
+
+            .recipe-card {
+                padding: 10px 12px;
+                gap: 6px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .recipe-card .pair {
+                width: 100%;
+                gap: 6px;
+            }
+
+            .recipe-card .elem-chip {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+                gap: 4px;
+            }
+
+            .recipe-card .elem-chip .icon {
+                font-size: 1rem;
+            }
+
+            .recipe-card .arrow {
+                font-size: 0.9rem;
+            }
+
+            .recipe-card .painting-name {
+                font-size: 0.85rem;
+                margin-left: 0;
+                margin-top: 2px;
+            }
+
+            .recipe-card .painting-author {
+                font-size: 0.75rem;
+            }
+
+            .recipe-card .unlock-info {
+                font-size: 0.75rem;
+                margin-top: 4px;
+            }
+
+            .recipe-card .unlock-info .elem-chip {
+                padding: 2px 6px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Очень узкие экраны */
+        @media (max-width: 400px) {
+            .elements-list {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+
+            .element-btn {
+                padding: 8px 4px;
+                min-height: 60px;
+            }
+
+            .element-btn .element-icon {
+                font-size: 1.3rem;
+            }
+
+            .element-btn .element-name {
+                font-size: 0.6rem;
+            }
+
+            .recipe-card .pair {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 <body>
@@ -188,8 +414,11 @@
         </header>
 
         <div class="guide-layout">
-            <div class="panel">
+            <div class="panel elements-panel">
                 <h2>Элементы</h2>
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" id="element-search" placeholder="Поиск элемента...">
+                </div>
                 <div class="elements-list" id="elements-list"></div>
                 <div class="legend-row">
                     <span><i class="legend-dot unlocked"></i> открыт</span>
@@ -198,7 +427,7 @@
             </div>
             <div class="panel result-area">
                 <h2>Что можно создать</h2>
-                <div class="result-placeholder" id="result-placeholder">Выберите элемент слева</div>
+                <div class="result-placeholder" id="result-placeholder">Выберите элемент или нажмите «Все»</div>
                 <div class="result-content" id="result-content" style="display: none;"></div>
             </div>
         </div>
@@ -208,6 +437,8 @@
         (function() {
             var unlockedIds = [];
             var selectedElementId = null;
+            var showAllMode = false;
+            var searchQuery = '';
 
             function loadUnlockedFromStorage() {
                 unlockedIds = [];
@@ -249,23 +480,55 @@
                 });
             }
 
+            function getAllRecipes() {
+                return recipes || [];
+            }
+
             function renderElementsList(selectedId) {
                 loadUnlockedFromStorage();
                 var container = document.getElementById('elements-list');
                 var all = getAllElements();
                 container.innerHTML = '';
+
+                // Кнопка "Все комбинации"
+                var allBtn = document.createElement('button');
+                allBtn.type = 'button';
+                allBtn.className = 'element-btn show-all-btn' + (showAllMode ? ' selected' : '');
+                allBtn.innerHTML = '<span class="element-icon">📋</span><span class="element-name">Все</span>';
+                allBtn.setAttribute('data-name', 'все комбинации');
+                allBtn.addEventListener('click', function() { showAllRecipes(); });
+                container.appendChild(allBtn);
+
                 all.forEach(function(el) {
                     var unlocked = el.base || unlockedIds.indexOf(el.id) !== -1;
                     var btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'element-btn' + (unlocked ? '' : ' locked') + (selectedId === el.id ? ' selected' : '');
+                    btn.className = 'element-btn' + (unlocked ? '' : ' locked') + (selectedId === el.id && !showAllMode ? ' selected' : '');
                     btn.innerHTML = '<span class="element-icon">' + (el.icon || '') + '</span><span class="element-name">' + (el.name || el.id) + '</span>';
+                    btn.setAttribute('data-name', (el.name || el.id).toLowerCase());
                     btn.addEventListener('click', function() { selectElement(el.id); });
                     container.appendChild(btn);
+                });
+
+                // Применить фильтр поиска
+                applySearchFilter();
+            }
+
+            function applySearchFilter() {
+                var btns = document.querySelectorAll('.elements-list .element-btn');
+                var query = searchQuery.toLowerCase().trim();
+                btns.forEach(function(btn) {
+                    var name = btn.getAttribute('data-name') || '';
+                    if (!query || name.indexOf(query) !== -1) {
+                        btn.classList.remove('hidden');
+                    } else {
+                        btn.classList.add('hidden');
+                    }
                 });
             }
 
             function selectElement(elementId) {
+                showAllMode = false;
                 selectedElementId = elementId;
                 renderElementsList(elementId);
                 var placeholder = document.getElementById('result-placeholder');
@@ -313,11 +576,62 @@
                         unlockHtml;
                     listEl.appendChild(line);
                 });
+
+                // Скролл к результатам на мобильном
+                if (window.innerWidth <= 700) {
+                    content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            function showAllRecipes() {
+                showAllMode = true;
+                selectedElementId = null;
+                renderElementsList(null);
+                var placeholder = document.getElementById('result-placeholder');
+                var content = document.getElementById('result-content');
+                var allRecipes = getAllRecipes();
+
+                placeholder.style.display = 'none';
+                content.style.display = 'block';
+                content.innerHTML = '<div class="result-title">📋 Все комбинации (' + allRecipes.length + ')</div><div class="recipe-list"></div>';
+                var listEl = content.querySelector('.recipe-list');
+
+                allRecipes.forEach(function(recipe) {
+                    var el1 = getElementById(recipe.elements[0]);
+                    var el2 = getElementById(recipe.elements[1]);
+                    var el1Unlocked = el1 && (el1.base || unlockedIds.indexOf(el1.id) !== -1);
+                    var el2Unlocked = el2 && (el2.base || unlockedIds.indexOf(el2.id) !== -1);
+                    var unlocksId = recipe.unlocks && recipe.unlocks !== 'null' ? recipe.unlocks : null;
+                    var unlockEl = unlocksId ? getElementById(unlocksId) : null;
+                    var unlockHtml = unlockEl
+                        ? '<div class="unlock-info">Открывает: <span class="elem-chip' + (unlockedIds.indexOf(unlocksId) !== -1 ? '' : ' locked') + '"><span class="icon">' + unlockEl.icon + '</span>' + unlockEl.name + '</span></div>'
+                        : '';
+                    var line = document.createElement('div');
+                    line.className = 'recipe-card';
+                    line.innerHTML =
+                        '<div class="pair">' +
+                        '<span class="elem-chip' + (el1Unlocked ? '' : ' locked') + '"><span class="icon">' + (el1 ? el1.icon : '?') + '</span>' + (el1 ? el1.name : recipe.elements[0]) + '</span>' +
+                        '<span class="arrow">+</span>' +
+                        '<span class="elem-chip' + (el2Unlocked ? '' : ' locked') + '"><span class="icon">' + (el2 ? el2.icon : '?') + '</span>' + (el2 ? el2.name : recipe.elements[1]) + '</span>' +
+                        '<span class="arrow">→</span>' +
+                        '<span class="painting-name">' + (recipe.name || recipe.id) + '</span>' +
+                        (recipe.author ? ' <span class="painting-author">(' + recipe.author + ')</span>' : '') +
+                        '</div>' +
+                        unlockHtml;
+                    listEl.appendChild(line);
+                });
+
+                // Скролл к результатам на мобильном
+                if (window.innerWidth <= 700) {
+                    content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
 
             function refreshFromStorage() {
                 loadUnlockedFromStorage();
-                if (selectedElementId) {
+                if (showAllMode) {
+                    showAllRecipes();
+                } else if (selectedElementId) {
                     selectElement(selectedElementId);
                 } else {
                     renderElementsList(null);
@@ -326,6 +640,16 @@
 
             function init() {
                 renderElementsList(null);
+
+                // Поиск элементов
+                var searchInput = document.getElementById('element-search');
+                if (searchInput) {
+                    searchInput.addEventListener('input', function() {
+                        searchQuery = this.value;
+                        applySearchFilter();
+                    });
+                }
+
                 document.addEventListener('visibilitychange', function() {
                     if (document.visibilityState === 'visible') {
                         refreshFromStorage();
@@ -338,7 +662,9 @@
                 window.addEventListener('storage', function(e) {
                     if (e.key === 'mosaicGameState') {
                         loadUnlockedFromStorage();
-                        if (selectedElementId) {
+                        if (showAllMode) {
+                            showAllRecipes();
+                        } else if (selectedElementId) {
                             selectElement(selectedElementId);
                         } else {
                             renderElementsList(null);

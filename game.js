@@ -183,6 +183,9 @@ function saveGameState() {
     localStorage.setItem('mosaicGameState', JSON.stringify(toSave));
 }
 
+// Кэш загруженных изображений
+const imageCache = {};
+
 // Предзагрузка изображений
 function preloadImages() {
     // Сначала загружаем картины, которые пользователь может создать прямо сейчас
@@ -194,8 +197,11 @@ function preloadImages() {
     
     // Загружаем доступные картины с высоким приоритетом
     availableRecipes.forEach(recipe => {
-        if (recipe.image) {
+        if (recipe.image && !imageCache[recipe.image]) {
             const img = new Image();
+            img.onload = function() {
+                imageCache[recipe.image] = img;
+            };
             img.src = recipe.image;
         }
     });
@@ -203,8 +209,11 @@ function preloadImages() {
     // Затем загружаем остальные картины в фоне (с небольшой задержкой)
     setTimeout(() => {
         recipes.forEach(recipe => {
-            if (recipe.image && !availableRecipes.includes(recipe)) {
+            if (recipe.image && !imageCache[recipe.image]) {
                 const img = new Image();
+                img.onload = function() {
+                    imageCache[recipe.image] = img;
+                };
                 img.src = recipe.image;
             }
         });
@@ -447,34 +456,46 @@ function createPaintingCard(recipe, size = 'large') {
     container.className = `painting-card painting-card-${size}`;
     
     if (recipe.image) {
-        const img = document.createElement('img');
-        img.className = 'painting-card-img';
-        img.alt = recipe.name;
-        
-        img.onload = function() {
-            container.innerHTML = '';
+        // Проверяем, есть ли картинка в кэше
+        if (imageCache[recipe.image]) {
+            // Картинка уже загружена — показываем сразу
+            const img = imageCache[recipe.image].cloneNode();
+            img.className = 'painting-card-img';
+            img.alt = recipe.name;
             container.appendChild(img);
-        };
-        
-        img.onerror = function() {
-            // Заглушка если изображение не загрузилось
+        } else {
+            // Картинка ещё не загружена — показываем заглушку и ждём
+            const img = document.createElement('img');
+            img.className = 'painting-card-img';
+            img.alt = recipe.name;
+            
+            img.onload = function() {
+                // Сохраняем в кэш
+                imageCache[recipe.image] = img.cloneNode();
+                container.innerHTML = '';
+                container.appendChild(img);
+            };
+            
+            img.onerror = function() {
+                // Заглушка если изображение не загрузилось
+                container.innerHTML = `
+                    <div class="painting-card-bg" style="background: ${DEFAULT_GRADIENT};">
+                        <div class="painting-card-frame">🖼️</div>
+                        <div class="painting-card-title">${recipe.name}</div>
+                    </div>
+                `;
+            };
+            
+            img.src = recipe.image;
+            
+            // Показываем заглушку с индикатором загрузки
             container.innerHTML = `
-                <div class="painting-card-bg" style="background: ${DEFAULT_GRADIENT};">
-                    <div class="painting-card-frame">🖼️</div>
+                <div class="painting-card-bg painting-loading" style="background: ${DEFAULT_GRADIENT};">
+                    <div class="painting-card-frame">⏳</div>
                     <div class="painting-card-title">${recipe.name}</div>
                 </div>
             `;
-        };
-        
-        img.src = recipe.image;
-        
-        // Показываем заглушку пока грузится
-        container.innerHTML = `
-            <div class="painting-card-bg" style="background: ${DEFAULT_GRADIENT};">
-                <div class="painting-card-frame">🖼️</div>
-                <div class="painting-card-title">${recipe.name}</div>
-            </div>
-        `;
+        }
     } else {
         // Нет изображения — показываем заглушку
         container.innerHTML = `

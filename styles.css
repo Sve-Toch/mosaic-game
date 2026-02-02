@@ -864,6 +864,16 @@ h1, h2, h3 {
     opacity: 0.7;
 }
 
+/* Анимация загрузки картины */
+.painting-loading .painting-card-frame {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
 .painting-card-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.1rem;
