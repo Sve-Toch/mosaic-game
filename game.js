@@ -183,6 +183,34 @@ function saveGameState() {
     localStorage.setItem('mosaicGameState', JSON.stringify(toSave));
 }
 
+// Предзагрузка изображений
+function preloadImages() {
+    // Сначала загружаем картины, которые пользователь может создать прямо сейчас
+    const availableRecipes = recipes.filter(r => 
+        r.elements.every(elId => 
+            gameState.unlockedElements.find(el => el.id === elId)
+        )
+    );
+    
+    // Загружаем доступные картины с высоким приоритетом
+    availableRecipes.forEach(recipe => {
+        if (recipe.image) {
+            const img = new Image();
+            img.src = recipe.image;
+        }
+    });
+    
+    // Затем загружаем остальные картины в фоне (с небольшой задержкой)
+    setTimeout(() => {
+        recipes.forEach(recipe => {
+            if (recipe.image && !availableRecipes.includes(recipe)) {
+                const img = new Image();
+                img.src = recipe.image;
+            }
+        });
+    }, 1000);
+}
+
 // Инициализация игры
 function initGame() {
     loadGameState();
@@ -196,6 +224,9 @@ function initGame() {
     renderGallery();
     updateStats();
     setupEventListeners();
+    
+    // Предзагрузка изображений после инициализации UI
+    preloadImages();
 }
 
 // Рендеринг элементов
@@ -402,6 +433,9 @@ function createPainting(recipe) {
     renderGallery();
     updateStats();
     showPaintingModal(recipe);
+    
+    // Предзагрузка новых доступных картин после разблокировки элемента
+    preloadImages();
 }
 
 // Стандартный градиент для всех картин (если нет изображения)
