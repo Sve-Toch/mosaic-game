@@ -514,6 +514,12 @@ function showPaintingModal(recipe) {
         newElementReveal.style.display = 'none';
     }
     
+    // Сброс скролла в начало
+    const modalContent = modal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.scrollTop = 0;
+    }
+    
     modal.classList.add('active');
 }
 
@@ -598,6 +604,12 @@ function showGalleryModal(recipe) {
     } else {
         questionsDiv.innerHTML = '';
         questionsDiv.style.display = 'none';
+    }
+    
+    // Сброс скролла в начало
+    const modalContent = modal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.scrollTop = 0;
     }
     
     modal.classList.add('active');
