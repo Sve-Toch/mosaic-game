@@ -494,6 +494,10 @@
                 <div class="result-content" id="result-content" style="display: none;"></div>
             </div>
         </div>
+
+        <footer style="text-align: center; padding: 20px 0; color: #95a5a6; font-size: 0.85rem;">
+            Автор: <a href="https://github.com/Sve-Toch" target="_blank" rel="noopener" style="color: #5c6bc0;">Sve-Toch</a>
+        </footer>
     </div>
 
     <!-- Bottom Sheet для мобильных -->
@@ -661,7 +665,10 @@
                 document.body.style.overflow = '';
             }
 
-            function selectElement(elementId) {
+            function selectElement(elementId, openSheet) {
+                // openSheet: true — открыть шторку на мобильном, false — только выделить
+                if (openSheet === undefined) openSheet = true;
+
                 showAllMode = false;
                 selectedElementId = elementId;
                 renderElementsList(elementId);
@@ -672,11 +679,13 @@
                 if (!el) return;
 
                 if (isMobile()) {
-                    // На мобильных — показываем в Bottom Sheet
-                    if (recipeList.length === 0) {
-                        openBottomSheet(el.icon + ' ' + el.name, '<p style="color: #95a5a6; text-align: center; padding: 20px;">Из этого элемента пока нет комбинаций</p>');
-                    } else {
-                        openBottomSheet(el.icon + ' ' + el.name + ' (' + recipeList.length + ')', buildRecipeListHTML(recipeList, elementId));
+                    // На мобильных — показываем в Bottom Sheet только если openSheet = true
+                    if (openSheet) {
+                        if (recipeList.length === 0) {
+                            openBottomSheet(el.icon + ' ' + el.name, '<p style="color: #95a5a6; text-align: center; padding: 20px;">Из этого элемента пока нет комбинаций</p>');
+                        } else {
+                            openBottomSheet(el.icon + ' ' + el.name + ' (' + recipeList.length + ')', buildRecipeListHTML(recipeList, elementId));
+                        }
                     }
                 } else {
                     // На десктопе — в обычной панели
@@ -695,7 +704,9 @@
                 }
             }
 
-            function showAllRecipes() {
+            function showAllRecipes(openSheet) {
+                if (openSheet === undefined) openSheet = true;
+
                 showAllMode = true;
                 selectedElementId = null;
                 renderElementsList(null);
@@ -703,8 +714,10 @@
                 var allRecipes = getAllRecipes();
 
                 if (isMobile()) {
-                    // На мобильных — показываем в Bottom Sheet
-                    openBottomSheet('📋 Все комбинации (' + allRecipes.length + ')', buildRecipeListHTML(allRecipes, null));
+                    // На мобильных — показываем в Bottom Sheet только если openSheet = true
+                    if (openSheet) {
+                        openBottomSheet('📋 Все комбинации (' + allRecipes.length + ')', buildRecipeListHTML(allRecipes, null));
+                    }
                 } else {
                     // На десктопе — в обычной панели
                     var placeholder = document.getElementById('result-placeholder');
@@ -718,12 +731,21 @@
 
             function refreshFromStorage() {
                 loadUnlockedFromStorage();
+                // Проверяем, открыта ли шторка сейчас
+                var sheetIsOpen = bottomSheet && bottomSheet.classList.contains('visible');
+                
                 if (showAllMode) {
-                    showAllRecipes();
+                    showAllRecipes(sheetIsOpen);
                 } else if (selectedElementId) {
-                    selectElement(selectedElementId);
+                    selectElement(selectedElementId, sheetIsOpen);
                 } else {
-                    renderElementsList(null);
+                    // Если ничего не выбрано — выбираем первый элемент (без открытия шторки)
+                    var allElements = getAllElements();
+                    if (allElements.length > 0) {
+                        selectElement(allElements[0].id, false);
+                    } else {
+                        renderElementsList(null);
+                    }
                 }
             }
 
@@ -746,7 +768,13 @@
                     }
                 });
 
-                renderElementsList(null);
+                // При загрузке выбираем первый базовый элемент (без открытия шторки на мобильном)
+                var allElements = getAllElements();
+                if (allElements.length > 0) {
+                    selectElement(allElements[0].id, false);
+                } else {
+                    renderElementsList(null);
+                }
 
                 // Поиск элементов
                 var searchInput = document.getElementById('element-search');
@@ -768,14 +796,7 @@
                 });
                 window.addEventListener('storage', function(e) {
                     if (e.key === 'mosaicGameState') {
-                        loadUnlockedFromStorage();
-                        if (showAllMode) {
-                            showAllRecipes();
-                        } else if (selectedElementId) {
-                            selectElement(selectedElementId);
-                        } else {
-                            renderElementsList(null);
-                        }
+                        refreshFromStorage();
                     }
                 });
             }
