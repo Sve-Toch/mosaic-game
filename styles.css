@@ -98,6 +98,12 @@ h1, h2, h3 {
     font-size: 1.3rem;
 }
 
+/* Скрыты на десктопе — только для мобильного */
+.mobile-elements-hint,
+.mobile-hint-block {
+    display: none;
+}
+
 .elements-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
@@ -863,6 +869,140 @@ h1, h2, h3 {
     justify-content: center;
 }
 
+/* Выбранный элемент (для режима "два тапа") */
+.element.selected {
+    border-color: #5c6bc0;
+    background: linear-gradient(145deg, #e8ecf7, #dde3f5);
+    box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.3);
+    transform: scale(1.05);
+}
+
+/* Мобильный индикатор выбранного элемента — fixed внизу */
+.mobile-selection-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 14px 16px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.mobile-selection-bar.visible {
+    display: flex;
+}
+
+.selection-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.selection-label {
+    color: #95a5a6;
+    font-size: 0.9rem;
+}
+
+.selection-element {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #5c6bc0;
+}
+
+.selection-hint {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.selection-clear {
+    background: #f8f9fa;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: #95a5a6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.selection-clear:hover,
+.selection-clear:active {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* Toast-сообщения для мобильного */
+.mobile-toast {
+    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2c3e50;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    z-index: 200;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    animation: toastIn 0.3s ease;
+    text-align: center;
+    max-width: calc(100% - 40px);
+}
+
+.mobile-toast.mobile-toast-with-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast-suggest-btn {
+    background: #5c6bc0;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.mobile-toast.fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
 /* Адаптивность — планшеты и большие телефоны */
 @media (max-width: 768px) {
     .game-area {
@@ -900,7 +1040,58 @@ h1, h2, h3 {
         padding: 12px;
         padding-left: max(12px, env(safe-area-inset-left));
         padding-right: max(12px, env(safe-area-inset-right));
-        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        /* Добавляем отступ снизу для индикатора выбора */
+        padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom)));
+    }
+
+    /* Скрываем зону комбинирования на мобильном — используем режим "два тапа" */
+    .combine-zone {
+        display: none;
+    }
+
+    /* Показываем подсказку и кнопку подсказки в панели элементов */
+    .mobile-elements-hint {
+        display: block;
+        color: #5c6bc0;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 14px;
+        padding: 10px 14px;
+        background: #e8ecf7;
+        border-radius: 12px;
+    }
+
+    .mobile-elements-hint.dismissed {
+        display: none;
+    }
+
+    .mobile-hint-block {
+        display: block;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e9ecef;
+        text-align: center;
+    }
+
+    .mobile-hint-block .hint-btn {
+        background: #fff;
+        color: #3498db;
+        border: 2px solid #3498db;
+        padding: 12px 20px;
+        font-size: 1rem;
+        border-radius: 25px;
+        cursor: pointer;
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .mobile-hint-block .hint-text {
+        color: #27ae60;
+        font-style: italic;
+        margin-top: 12px;
+        min-height: 20px;
+        font-weight: 500;
+        font-size: 0.95rem;
     }
 
     .header {

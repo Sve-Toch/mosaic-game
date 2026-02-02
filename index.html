@@ -33,8 +33,13 @@
             <!-- Панель элементов -->
             <div class="elements-panel">
                 <h2>Элементы</h2>
+                <p class="mobile-elements-hint" id="mobile-elements-hint">Нажмите на два элемента, чтобы создать картину</p>
                 <div class="elements-grid" id="elements-grid">
                     <!-- Элементы будут добавлены через JavaScript -->
+                </div>
+                <div class="mobile-hint-block">
+                    <button class="hint-btn" id="mobile-hint-btn">Показать подсказку</button>
+                    <p class="hint-text" id="mobile-hint-text"></p>
                 </div>
             </div>
 
@@ -127,6 +132,16 @@
             <p>Игра вдохновлена шедеврами русских художников</p>
             <a href="guide.html" id="guide-link" style="color: #5c6bc0; text-decoration: none;">Справочник всех комбинаций</a>
         </footer>
+    </div>
+
+    <!-- Мобильный индикатор выбранного элемента (fixed внизу) -->
+    <div class="mobile-selection-bar" id="mobile-selection-bar">
+        <div class="selection-content">
+            <span class="selection-label">Выбрано:</span>
+            <span class="selection-element" id="selection-element"></span>
+            <span class="selection-hint">Нажмите на другой элемент</span>
+        </div>
+        <button class="selection-clear" id="selection-clear" aria-label="Сбросить выбор">&times;</button>
     </div>
 
     <script src="data.js"></script>

@@ -10,7 +10,9 @@ let gameState = {
     unlockedElements: [],
     createdPaintings: [],
     slot1: null,
-    slot2: null
+    slot2: null,
+    // Для мобильного режима "два тапа"
+    selectedElement: null
 };
 
 // Определение мобильного/тач-устройства (для отключения drag и показа подсказки)
@@ -23,6 +25,122 @@ function dismissMobileTapHint() {
     if (hint && !hint.classList.contains('dismissed')) {
         hint.classList.add('dismissed');
     }
+}
+
+// ============================================
+// МОБИЛЬНЫЙ РЕЖИМ "ДВА ТАПА"
+// ============================================
+
+// Показать индикатор выбранного элемента
+function showSelectionBar(element) {
+    const bar = document.getElementById('mobile-selection-bar');
+    const elementSpan = document.getElementById('selection-element');
+    if (bar && elementSpan) {
+        elementSpan.textContent = `${element.icon} ${element.name}`;
+        bar.classList.add('visible');
+    }
+}
+
+// Скрыть индикатор
+function hideSelectionBar() {
+    const bar = document.getElementById('mobile-selection-bar');
+    if (bar) {
+        bar.classList.remove('visible');
+    }
+}
+
+// Сбросить выбор элемента
+function clearSelection() {
+    gameState.selectedElement = null;
+    hideSelectionBar();
+    // Убрать подсветку со всех элементов
+    document.querySelectorAll('.element.selected').forEach(el => {
+        el.classList.remove('selected');
+    });
+}
+
+// Подсветить выбранный элемент в сетке
+function highlightSelectedElement(elementId) {
+    // Сначала убрать подсветку со всех
+    document.querySelectorAll('.element.selected').forEach(el => {
+        el.classList.remove('selected');
+    });
+    // Подсветить нужный
+    const elementDiv = document.querySelector(`.element[data-element-id="${elementId}"]`);
+    if (elementDiv) {
+        elementDiv.classList.add('selected');
+    }
+}
+
+// Попытка создать комбинацию (для режима "два тапа")
+function tryMobileCombine(element1, element2) {
+    const elements = [element1.id, element2.id].sort();
+    
+    // Поиск рецепта
+    const recipe = recipes.find(r => {
+        const recipeElements = [...r.elements].sort();
+        return recipeElements[0] === elements[0] && recipeElements[1] === elements[1];
+    });
+
+    if (recipe) {
+        if (gameState.createdPaintings.includes(recipe.id)) {
+            showMobileMessage('Вы уже создали эту картину!');
+        } else {
+            createPainting(recipe);
+        }
+    } else {
+        showMobileNoRecipeMessage(element1, element2);
+    }
+    
+    // Сбросить выбор после попытки
+    clearSelection();
+}
+
+// Показать сообщение на мобильном (toast-стиль)
+function showMobileMessage(text) {
+    // Удалить предыдущее сообщение если есть
+    const existing = document.querySelector('.mobile-toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'mobile-toast';
+    toast.textContent = text;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
+// Сообщение "нет рецепта" на мобильном
+function showMobileNoRecipeMessage(el1, el2) {
+    // Сохраняем элементы для возможного предложения
+    gameState.slot1 = el1;
+    gameState.slot2 = el2;
+    
+    const existing = document.querySelector('.mobile-toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'mobile-toast mobile-toast-with-action';
+    toast.innerHTML = `
+        <span>Комбинация не найдена</span>
+        <button class="toast-suggest-btn">Предложить</button>
+    `;
+    document.body.appendChild(toast);
+    
+    toast.querySelector('.toast-suggest-btn').addEventListener('click', () => {
+        toast.remove();
+        showSuggestModal();
+    });
+    
+    setTimeout(() => {
+        if (document.body.contains(toast)) {
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 300);
+        }
+    }, 4000);
 }
 
 // Инициализация базовых элементов
@@ -107,23 +225,54 @@ function renderElements() {
         div.addEventListener('click', (e) => {
             e.preventDefault();
             handleElementClick(element);
-            dismissMobileTapHint();
         });
 
         grid.appendChild(div);
     });
+    
+    // Восстановить подсветку выбранного элемента (если есть)
+    if (gameState.selectedElement) {
+        highlightSelectedElement(gameState.selectedElement.id);
+    }
 }
 
-// Обработка клика по элементу (основной способ на мобильном)
+// Обработка клика по элементу
 function handleElementClick(element) {
+    const isMobile = isMobileOrTouch();
+    
+    if (isMobile) {
+        // Мобильный режим: два тапа
+        handleMobileElementClick(element);
+    } else {
+        // Десктоп: добавляем в слоты
+        handleDesktopElementClick(element);
+    }
+}
+
+// Мобильный режим: два тапа для комбинации
+function handleMobileElementClick(element) {
+    if (!gameState.selectedElement) {
+        // Первый тап — выбираем элемент
+        gameState.selectedElement = element;
+        highlightSelectedElement(element.id);
+        showSelectionBar(element);
+    } else if (gameState.selectedElement.id === element.id) {
+        // Тап по тому же элементу — сбрасываем выбор
+        clearSelection();
+    } else {
+        // Тап по другому элементу — пробуем комбинацию
+        tryMobileCombine(gameState.selectedElement, element);
+    }
+}
+
+// Десктоп: добавляем в слоты (старая логика)
+function handleDesktopElementClick(element) {
     if (!gameState.slot1) {
         gameState.slot1 = element;
         updateSlot(1, element);
-        dismissMobileTapHint();
     } else if (!gameState.slot2) {
         gameState.slot2 = element;
         updateSlot(2, element);
-        dismissMobileTapHint();
     }
 }
 
@@ -484,7 +633,7 @@ function sendSuggestToEmail(name, author) {
     closeSuggestModal();
 }
 
-// Подсказка
+// Подсказка (десктоп)
 function showHint() {
     const availableRecipes = recipes.filter(r => {
         if (gameState.createdPaintings.includes(r.id)) return false;
@@ -494,6 +643,34 @@ function showHint() {
     });
 
     const hintText = document.getElementById('hint-text');
+    
+    if (availableRecipes.length === 0) {
+        hintText.textContent = 'Поздравляем! Вы создали все доступные картины!';
+    } else {
+        const randomRecipe = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
+        const el1 = gameState.unlockedElements.find(el => el.id === randomRecipe.elements[0]);
+        const el2 = gameState.unlockedElements.find(el => el.id === randomRecipe.elements[1]);
+        hintText.textContent = `Попробуйте: ${el1.icon} ${el1.name} + ${el2.icon} ${el2.name}`;
+    }
+}
+
+// Подсказка (мобильный)
+function showMobileHint() {
+    const availableRecipes = recipes.filter(r => {
+        if (gameState.createdPaintings.includes(r.id)) return false;
+        return r.elements.every(elId => 
+            gameState.unlockedElements.find(el => el.id === elId)
+        );
+    });
+
+    const hintText = document.getElementById('mobile-hint-text');
+    if (!hintText) return;
+    
+    // Скрыть подсказку над сеткой
+    const elementsHint = document.getElementById('mobile-elements-hint');
+    if (elementsHint) {
+        elementsHint.classList.add('dismissed');
+    }
     
     if (availableRecipes.length === 0) {
         hintText.textContent = 'Поздравляем! Вы создали все доступные картины!';
@@ -525,11 +702,16 @@ function setupEventListeners() {
 
     // Кнопки
     document.getElementById('combine-btn').addEventListener('click', () => {
-        dismissMobileTapHint();
         tryCreatePainting();
     });
     document.getElementById('clear-btn').addEventListener('click', clearSlots);
     document.getElementById('hint-btn').addEventListener('click', showHint);
+    
+    // Мобильная кнопка подсказки
+    const mobileHintBtn = document.getElementById('mobile-hint-btn');
+    if (mobileHintBtn) {
+        mobileHintBtn.addEventListener('click', showMobileHint);
+    }
 
     document.getElementById('guide-link').addEventListener('click', function(e) {
         e.preventDefault();
@@ -537,6 +719,12 @@ function setupEventListeners() {
         var q = ids.length ? '?unlocked=' + encodeURIComponent(ids.join(',')) : '';
         window.location.href = 'guide.html' + q;
     });
+
+    // Кнопка сброса выбора в мобильном индикаторе
+    const selectionClearBtn = document.getElementById('selection-clear');
+    if (selectionClearBtn) {
+        selectionClearBtn.addEventListener('click', clearSelection);
+    }
 
     // Закрытие модальных окон
     document.getElementById('close-modal').addEventListener('click', () => {
