@@ -127,8 +127,8 @@ function showMobileNoRecipeMessage(el1, el2) {
     toast.innerHTML = `
         <span>Комбинация не найдена</span>
         <div class="toast-buttons">
-            <button class="toast-continue-btn">Продолжить</button>
             <button class="toast-suggest-btn">Предложить</button>
+            <button class="toast-continue-btn">Продолжить</button>
         </div>
     `;
     document.body.appendChild(toast);

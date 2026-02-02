@@ -1020,9 +1020,9 @@ h1, h2, h3 {
 }
 
 .toast-continue-btn {
-    background: #fff;
-    color: #5c6bc0;
-    border: 2px solid #5c6bc0;
+    background: #3d4a6b;
+    color: #fff;
+    border: none;
     padding: 10px 20px;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -1033,9 +1033,9 @@ h1, h2, h3 {
 }
 
 .toast-suggest-btn {
-    background: #5c6bc0;
-    color: #fff;
-    border: none;
+    background: #fff;
+    color: #5c6bc0;
+    border: 2px solid #5c6bc0;
     padding: 10px 20px;
     border-radius: 20px;
     font-size: 0.9rem;
