@@ -123,32 +123,16 @@ function showMobileNoRecipeMessage(el1, el2) {
     if (existing) existing.remove();
     
     const toast = document.createElement('div');
-    toast.className = 'mobile-toast mobile-toast-with-action';
-    toast.innerHTML = `
-        <span>Комбинация не найдена</span>
-        <div class="toast-buttons">
-            <button class="toast-suggest-btn">Предложить</button>
-            <button class="toast-continue-btn">Продолжить</button>
-        </div>
-    `;
+    toast.className = 'mobile-toast';
+    toast.textContent = 'Такой комбинации нет';
     document.body.appendChild(toast);
-    
-    toast.querySelector('.toast-continue-btn').addEventListener('click', () => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 300);
-    });
-    
-    toast.querySelector('.toast-suggest-btn').addEventListener('click', () => {
-        toast.remove();
-        showSuggestModal();
-    });
     
     setTimeout(() => {
         if (document.body.contains(toast)) {
             toast.classList.add('fade-out');
             setTimeout(() => toast.remove(), 300);
         }
-    }, 4000);
+    }, 2500);
 }
 
 // Инициализация базовых элементов
@@ -657,7 +641,7 @@ function showMessage(text, type) {
     setTimeout(() => msg.remove(), 3000);
 }
 
-// Сообщение при неизвестной комбинации + ссылка «Предложить свой вариант»
+// Сообщение при неизвестной комбинации
 function showNoRecipeMessage() {
     const combineZone = document.querySelector('.combine-zone');
     
@@ -665,47 +649,11 @@ function showNoRecipeMessage() {
     if (existingMsg) existingMsg.remove();
     
     const msg = document.createElement('div');
-    msg.className = 'error-message error-with-suggest';
-    msg.innerHTML = 'Эта комбинация не создаёт картину. <button type="button" class="suggest-link">Предложить свой вариант</button>';
+    msg.className = 'error-message';
+    msg.textContent = 'Такой комбинации нет';
     combineZone.appendChild(msg);
     
-    msg.querySelector('.suggest-link').addEventListener('click', () => {
-        msg.remove();
-        showSuggestModal();
-    });
-}
-
-// Показать модальное окно «Предложить свой вариант»
-function showSuggestModal() {
-    if (!gameState.slot1 || !gameState.slot2) return;
-    
-    const comboEl = document.getElementById('suggest-combination');
-    comboEl.innerHTML = `
-        <span class="suggest-el">${gameState.slot1.icon} ${gameState.slot1.name}</span>
-        <span class="suggest-plus">+</span>
-        <span class="suggest-el">${gameState.slot2.icon} ${gameState.slot2.name}</span>
-    `;
-    
-    document.getElementById('suggest-name').value = '';
-    document.getElementById('suggest-author').value = '';
-    document.getElementById('suggest-modal').classList.add('active');
-}
-
-// Закрыть модальное окно предложения и очистить слоты
-function closeSuggestModal() {
-    document.getElementById('suggest-modal').classList.remove('active');
-    clearSlots();
-}
-
-// Отправить предложение на почту (mailto)
-function sendSuggestToEmail(name, author) {
-    const el1 = gameState.slot1 ? `${gameState.slot1.icon} ${gameState.slot1.name}` : '';
-    const el2 = gameState.slot2 ? `${gameState.slot2.icon} ${gameState.slot2.name}` : '';
-    const body = `Комбинация элементов: ${el1} + ${el2}\n\nПредложенное название картины: ${name}\nПредложенный автор: ${author}`;
-    const subject = `Предложение для Мозаики: "${name}" — ${author}`;
-    const mailto = `mailto:svetoch22@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-    closeSuggestModal();
+    setTimeout(() => msg.remove(), 3000);
 }
 
 // Подсказка (десктоп)
@@ -819,24 +767,10 @@ function setupEventListeners() {
         document.getElementById('gallery-modal').classList.remove('active');
     });
 
-    document.getElementById('close-suggest-modal').addEventListener('click', closeSuggestModal);
-
-    document.getElementById('suggest-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('suggest-name').value.trim();
-        const author = document.getElementById('suggest-author').value.trim();
-        if (name && author) {
-            sendSuggestToEmail(name, author);
-        }
-    });
-
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.classList.remove('active');
-                if (modal.id === 'suggest-modal') {
-                    clearSlots();
-                }
             }
         });
     });
@@ -846,9 +780,6 @@ function setupEventListeners() {
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.classList.remove('active');
             });
-            if (document.getElementById('suggest-modal').classList.contains('active')) {
-                clearSlots();
-            }
         }
     });
 }
